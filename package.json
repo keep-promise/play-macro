@@ -1,0 +1,25 @@
+{
+  "name": "play-macro",
+  "version": "1.0.0",
+  "description": "可配置化一键宏 GUI 工具：本地 Web 界面配置键鼠操作流水线，全局热键触发执行",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "macro",
+    "nut-js",
+    "uiohook",
+    "automation",
+    "gui"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@nut-tree/nut-js": "^3.1.2",
+    "dotenv": "^18.0.9",
+    "express": "^4.22.3",
+    "uiohook-napi": "^1.5.5",
+    "ws": "^8.22.0"
+  }
+}

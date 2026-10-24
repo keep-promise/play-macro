@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "schemeName": "2a",
+  "trigger": {
+    "key": "2",
+    "mode": "once",
+    "holdLoopInterval": 300
+  },
+  "exitKey": "P",
+  "timing": {
+    "globalSpeed": 1,
+    "stepJitter": 0,
+    "holdDuration": null,
+    "disableNutAutoDelay": true
+  },
+  "steps": [
+    {
+      "type": "pressKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "6",
+      "hold": true,
+      "holdDuration": {
+        "mode": "random",
+        "min": 7,
+        "max": 11
+      }
+    },
+    {
+      "type": "releaseKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "6"
+    },
+    {
+      "type": "mouseClick",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "button": "right"
+    },
+    {
+      "type": "randomDelay",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "min": 1000,
+      "max": 1100
+    },
+    {
+      "type": "pressKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "S",
+      "hold": true,
+      "holdDuration": null
+    }
+  ]
+}

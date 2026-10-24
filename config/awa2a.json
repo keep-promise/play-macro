@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "schemeName": "awa2a",
+  "trigger": {
+    "key": "2",
+    "mode": "once",
+    "holdLoopInterval": 300
+  },
+  "exitKey": "P",
+  "timing": {
+    "globalSpeed": 1,
+    "stepJitter": 0,
+    "holdDuration": null,
+    "disableNutAutoDelay": true
+  },
+  "steps": [
+    {
+      "type": "mouseClick",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "button": "right"
+    },
+    {
+      "type": "randomDelay",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "min": 444,
+      "max": 497
+    },
+    {
+      "type": "pressKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "T",
+      "hold": true,
+      "holdDuration": {
+        "mode": "random",
+        "min": 7,
+        "max": 16
+      }
+    },
+    {
+      "type": "releaseKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "T"
+    },
+    {
+      "type": "mouseClick",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "button": "right"
+    },
+    {
+      "type": "randomDelay",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "min": 360,
+      "max": 371
+    },
+    {
+      "type": "pressKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "6",
+      "hold": true,
+      "holdDuration": {
+        "mode": "random",
+        "min": 7,
+        "max": 11
+      }
+    },
+    {
+      "type": "releaseKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "6"
+    },
+    {
+      "type": "mouseClick",
+      "button": "right",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "type": "fixedDelay",
+      "interval": {
+        "mode": "fixed",
+        "value": 500
+      },
+      "ms": 0
+    },
+    {
+      "type": "pressKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "S",
+      "hold": true,
+      "holdDuration": null
+    }
+  ]
+}

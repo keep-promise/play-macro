@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "schemeName": "wa",
+  "trigger": {
+    "key": "W",
+    "mode": "once",
+    "holdLoopInterval": 300
+  },
+  "exitKey": "X",
+  "timing": {
+    "globalSpeed": 1,
+    "stepJitter": 0,
+    "holdDuration": null,
+    "disableNutAutoDelay": true
+  },
+  "steps": [
+    {
+      "type": "pressKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "T",
+      "hold": true,
+      "holdDuration": {
+        "mode": "random",
+        "min": 7,
+        "max": 11
+      }
+    },
+    {
+      "type": "releaseKey",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "key": "T"
+    },
+    {
+      "type": "mouseClick",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "button": "right"
+    },
+    {
+      "type": "randomDelay",
+      "interval": {
+        "mode": "fixed",
+        "value": 0
+      },
+      "min": 71,
+      "max": 91
+    }
+  ]
+}

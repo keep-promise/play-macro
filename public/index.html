@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一键宏配置工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ======== 顶部：标题 + 方案管理 ======== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">▶</div>
+      <div>
+        <h1>一键宏配置工具</h1>
+        <p class="subtitle">可配置化键鼠操作流水线 · 全局热键触发</p>
+      </div>
+    </div>
+    <div class="scheme-bar">
+      <label for="schemeSelect">方案</label>
+      <select id="schemeSelect"></select>
+      <button id="btnNewScheme" class="btn ghost" title="新建方案">＋ 新建</button>
+      <button id="btnDelScheme" class="btn ghost danger-text" title="删除当前方案">删除</button>
+      <button id="btnImport" class="btn ghost" title="导入 JSON 配置">导入</button>
+      <button id="btnExport" class="btn ghost" title="导出当前配置为 JSON">导出</button>
+    </div>
+  </header>
+
+  <!-- ======== 主区域：方案列表 | 操作序列 | 触发/时序 ======== -->
+  <main class="layout">
+
+    <!-- 左栏：方案列表 -->
+    <aside class="side-col scheme-col">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>方案列表</h2>
+          <button class="btn small ghost" id="btnCopyScheme" title="基于当前方案复制一套新的">⧉ 复制当前</button>
+        </div>
+        <p class="hint">支持多方案同时运行：点击 ▶ 将方案加入监听（按各自触发键执行），再点 ⏹ 停止该方案。运行中方案的触发/退出键生效。</p>
+        <div id="schemeList" class="scheme-list"></div>
+      </section>
+    </aside>
+
+    <!-- 中栏：操作序列 + 日志 -->
+    <div class="mid-col">
+      <section class="panel sequence-panel">
+        <div class="panel-head">
+          <h2>操作序列</h2>
+          <div class="panel-actions">
+            <button id="btnRecord" class="btn accent" title="录制模式：手动操作一遍，自动生成操作序列">🎙 录制</button>
+            <button id="btnAddStep" class="btn primary" title="添加操作步骤">＋ 添加步骤</button>
+          </div>
+        </div>
+        <p class="hint">拖动 <span class="grip">⠿</span> 可排序；点击步骤卡片可编辑参数。</p>
+
+        <div id="stepList" class="step-list">
+          <div class="empty-state" id="emptyState">
+            暂无操作步骤。<br>点击「添加步骤」或「录制」开始构建流水线。
+          </div>
+        </div>
+
+        <div class="sequence-footer">
+          <span class="chip" id="conflictChip" hidden>⚠ 热键冲突</span>
+          <button id="btnSave" class="btn primary">保存配置</button>
+          <span id="saveState" class="save-state"></span>
+        </div>
+      </section>
+
+      <!-- 日志面板（位于操作序列下方） -->
+      <section class="panel log-panel">
+        <div class="panel-head">
+          <h2>日志</h2>
+          <button class="btn small ghost" id="btnClearLog">清空</button>
+        </div>
+        <div id="logList" class="log-list"></div>
+      </section>
+    </div>
+
+    <!-- 右栏：触发与退出 / 时序 -->
+    <aside class="side-col">
+
+      <section class="panel">
+        <div class="panel-head"><h2>触发与退出</h2></div>
+
+        <div class="field">
+          <label>触发键</label>
+          <div class="hotkey-row">
+            <input id="triggerKeyInput" class="hotkey-input" placeholder="点击捕获按键" readonly>
+            <button class="btn small ghost" id="btnClearTrigger">清除</button>
+          </div>
+          <div class="hotkey-row" style="margin-top:6px">
+            <select id="triggerMouseSelect" style="flex:1">
+              <option value="">鼠标侧键：不使用</option>
+              <option value="Mouse4">Mouse4（侧键 1）</option>
+              <option value="Mouse5">Mouse5（侧键 2）</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>触发模式</label>
+          <select id="triggerMode">
+            <option value="once">单次触发（按一次执行一次）</option>
+            <option value="holdLoop">按住循环（按住持续执行，松开停止）</option>
+          </select>
+        </div>
+
+        <div class="field" id="loopIntervalField">
+          <label>循环间隔（ms）</label>
+          <input id="holdLoopInterval" type="number" min="0" step="10" value="300">
+        </div>
+
+        <div class="field">
+          <label>退出键</label>
+          <div class="hotkey-row">
+            <input id="exitKeyInput" class="hotkey-input" placeholder="点击捕获按键" readonly>
+            <button class="btn small ghost" id="btnClearExit">清除</button>
+          </div>
+          <div class="hotkey-row" style="margin-top:6px">
+            <select id="exitMouseSelect" style="flex:1">
+              <option value="">鼠标侧键：不使用</option>
+              <option value="Mouse4">Mouse4（侧键 1）</option>
+              <option value="Mouse5">Mouse5（侧键 2）</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>时序与流畅度</h2></div>
+
+        <div class="field">
+          <label>全局延迟倍率 <span class="unit">×</span></label>
+          <div class="range-row">
+            <input id="globalSpeed" type="range" min="0.5" max="2" step="0.05" value="1">
+            <output id="globalSpeedOut">1.00×</output>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>每步延迟抖动 <span class="unit">±ms</span></label>
+          <input id="stepJitter" type="number" min="0" step="1" value="0">
+        </div>
+
+        <div class="field">
+          <label>按键保持时长</label>
+          <div class="inline-select">
+            <select id="holdMode">
+              <option value="null">保持到显式松开</option>
+              <option value="fixed">固定时长</option>
+              <option value="random">随机区间</option>
+            </select>
+            <div class="hold-values" id="holdFixedBox">
+              <input id="holdFixed" type="number" min="0" step="10" placeholder="毫秒">
+            </div>
+            <div class="hold-values" id="holdRandomBox" hidden>
+              <input id="holdMin" type="number" min="0" step="10" placeholder="最小 ms">
+              <span>~</span>
+              <input id="holdMax" type="number" min="0" step="10" placeholder="最大 ms">
+            </div>
+          </div>
+        </div>
+
+        <div class="field checkbox-field">
+          <label class="check">
+            <input type="checkbox" id="disableNutAutoDelay" checked>
+            <span>关闭 nut.js 内置自动延迟（时序完全自控，推荐）</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 运行控制 -->
+      <section class="panel control-panel">
+        <div class="status-line">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">已停止</span>
+          <span class="current-step" id="currentStepText">当前步骤：-</span>
+        </div>
+        <div class="control-buttons">
+          <button id="btnStart" class="btn primary wide">▶ 运行当前方案</button>
+          <button id="btnStop" class="btn danger wide" disabled>⏹ 停止全部</button>
+          <button id="btnTest" class="btn ghost wide" title="不经过全局监听，直接执行一遍当前配置">🧪 测试运行</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- ======== 重命名方案模态框 ======== -->
+  <div class="modal-mask" id="renameModal" hidden>
+    <div class="modal modal-sm">
+      <div class="modal-head">
+        <h3 id="nameModalTitle">重命名方案</h3>
+        <button class="modal-close" id="btnCloseRenameModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="renameInput">方案名称</label>
+          <input id="renameInput" type="text" maxlength="40" placeholder="输入新的方案名" autocomplete="off">
+        </div>
+        <p class="hint" id="nameModalHint">名称将作为配置文件保存；不能与现有方案重名，内置 default 不可重命名。</p>
+        <p class="modal-error" id="renameError" hidden></p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="btnCancelRename">取消</button>
+        <button class="btn primary" id="btnConfirmRename">确认重命名</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== 步骤编辑模态框 ======== -->
+  <div class="modal-mask" id="stepModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="stepModalTitle">编辑步骤</h3>
+        <button class="modal-close" id="btnCloseModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>步骤类型</label>
+          <select id="stepType">
+            <option value="pressKey">按下按键（可保持）</option>
+            <option value="releaseKey">松开按键</option>
+            <option value="mouseClick">鼠标点击</option>
+            <option value="mouseMove">鼠标移动</option>
+            <option value="fixedDelay">固定延迟</option>
+            <option value="randomDelay">随机延迟</option>
+          </select>
+        </div>
+
+        <!-- pressKey / releaseKey -->
+        <div class="field type-group" data-types="pressKey,releaseKey">
+          <label>按键</label>
+          <div class="hotkey-row">
+            <select id="stepKeySelect"></select>
+            <input id="stepKeyCapture" class="hotkey-input" placeholder="或点击捕获" readonly>
+          </div>
+        </div>
+
+        <!-- pressKey 专属 -->
+        <div class="field type-group" data-types="pressKey">
+          <label class="check">
+            <input type="checkbox" id="stepHold" checked>
+            <span>保持按住（按住后等待松开步骤 / 宏结束自动释放）</span>
+          </label>
+        </div>
+        <div class="field type-group" data-types="pressKey" id="stepHoldDurationBox">
+          <label>本步骤保持时长</label>
+          <div class="inline-select">
+            <select id="stepHoldDurationMode">
+              <option value="null">使用全局设置</option>
+              <option value="fixed">固定时长</option>
+              <option value="random">随机区间</option>
+            </select>
+            <input id="stepHoldFixed" type="number" min="0" step="10" placeholder="毫秒" hidden>
+            <span id="stepHoldRangeSep" hidden>~</span>
+            <input id="stepHoldMin" type="number" min="0" step="10" placeholder="最小" hidden>
+            <input id="stepHoldMax" type="number" min="0" step="10" placeholder="最大" hidden>
+          </div>
+        </div>
+
+        <!-- mouseClick -->
+        <div class="field type-group" data-types="mouseClick">
+          <label>鼠标键</label>
+          <select id="stepMouseButton">
+            <option value="left">左键</option>
+            <option value="right">右键</option>
+            <option value="middle">中键</option>
+          </select>
+        </div>
+
+        <!-- mouseMove -->
+        <div class="field type-group" data-types="mouseMove">
+          <label>移动方式</label>
+          <select id="stepMoveMode">
+            <option value="absolute">绝对坐标（移动到指定位置）</option>
+            <option value="relative">相对位移（从当前位置移动）</option>
+          </select>
+        </div>
+        <div class="field type-group" data-types="mouseMove">
+          <label>X</label>
+          <input id="stepMoveX" type="number" step="1" value="0">
+        </div>
+        <div class="field type-group" data-types="mouseMove">
+          <label>Y</label>
+          <input id="stepMoveY" type="number" step="1" value="0">
+        </div>
+
+        <!-- fixedDelay -->
+        <div class="field type-group" data-types="fixedDelay">
+          <label>延迟时长（ms）</label>
+          <input id="stepDelayMs" type="number" min="0" step="10" value="100">
+        </div>
+
+        <!-- randomDelay -->
+        <div class="field type-group" data-types="randomDelay">
+          <label>随机区间（ms）</label>
+          <div class="inline-select">
+            <input id="stepDelayMin" type="number" min="0" step="10" value="50">
+            <span>~</span>
+            <input id="stepDelayMax" type="number" min="0" step="10" value="150">
+          </div>
+        </div>
+
+        <hr class="modal-divider">
+
+        <!-- 操作间隔（通用） -->
+        <div class="field">
+          <label>本步骤后的操作间隔</label>
+          <div class="inline-select">
+            <select id="stepIntervalMode">
+              <option value="fixed">固定</option>
+              <option value="random">随机区间</option>
+            </select>
+            <input id="stepIntervalFixed" type="number" min="0" step="10" value="0" placeholder="毫秒">
+            <span id="stepIntervalSep" hidden>~</span>
+            <input id="stepIntervalMin" type="number" min="0" step="10" value="50" placeholder="最小" hidden>
+            <input id="stepIntervalMax" type="number" min="0" step="10" value="150" placeholder="最大" hidden>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="btnCancelModal">取消</button>
+        <button class="btn primary" id="btnSaveStep">保存步骤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐藏的文件输入框：导入 JSON -->
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+
+  <script src="app.js"></script>
+</body>
+</html>
